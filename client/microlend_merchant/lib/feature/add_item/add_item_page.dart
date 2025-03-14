@@ -10,6 +10,8 @@ import 'package:microlend_merchant/core/space_box.dart';
 import 'package:microlend_merchant/models/item_model.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../util/store.dart';
+
 class AddItemPage extends StatefulWidget {
   const AddItemPage({super.key});
 
@@ -370,16 +372,13 @@ class _AddItemPageState extends State<AddItemPage> {
 
 Future<Map<String, dynamic>> addNewGroup(List<ItemModel> newItems) async {
   // Step 1: Get the file path
-  final appDocDir = await getApplicationDocumentsDirectory();
-  String filePath = '${appDocDir.path}/data.json';
+  final data = await getData('txns');
 
-  File file = File(filePath);
   List<dynamic> jsonList = [];
 
   // Step 2: Check if the file exists and read it
-  if (await file.exists()) {
-    String content = await file.readAsString();
-    jsonList = jsonDecode(content); // Decode JSON into a list of maps
+  if (data != null && data.isNotEmpty) {
+    jsonList = jsonDecode(data); // Decode JSON into a list of maps
   }
 
   // Step 3: Calculate the new group ID
@@ -398,9 +397,7 @@ Future<Map<String, dynamic>> addNewGroup(List<ItemModel> newItems) async {
   jsonList.add(newGroup);
 
   // Step 6: Save the updated JSON back to the file
-  await file.writeAsString(jsonEncode(jsonList));
-
-  print('New group with ID $newGroupId has been added.');
+  await saveData('txns', jsonEncode(jsonList));
 
   return newGroup;
 }

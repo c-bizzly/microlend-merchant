@@ -9,37 +9,16 @@ import 'package:microlend_merchant/core/space_box.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../models/item_model.dart';
+import '../../util/store.dart';
 
 Future<List<ItemModel>> getItems() async {
-  final appDocDir = await getApplicationDocumentsDirectory();
-  String filePath = '${appDocDir.path}/data.json';
+  final data = await getData('txns');
 
-  File file = File(filePath);
   List<dynamic> jsonList = [];
-  if (await file.exists()) {
-    String content = await file.readAsString();
-    jsonList = jsonDecode(content); // Decode the existing
+  if (data != null && data.isNotEmpty) {
+    jsonList = jsonDecode(data); // Decode the JSON data
   }
 
-  return jsonList.map((item) => ItemModel.fromJson(item)).toList();
-}
-
-Future<List<ItemModel>> getItems2({required String groupId}) async {
-  final appDocDir = await getApplicationDocumentsDirectory();
-  String filePath = '${appDocDir.path}/data.json';
-
-  File file = File(filePath);
-  List<dynamic> jsonList = [];
-  if (await file.exists()) {
-    String content = await file.readAsString();
-    jsonList = jsonDecode(content); // Decode the JSON data
-  }
-
-  // Find the group with the given groupId
-  // final group = jsonList.firstWhere(
-  //   (group) => group['id'] == groupId,
-  //   orElse: () => null, // Return null if no matching group is found
-  // );
   final group =
       jsonList.isNotEmpty
           ? jsonList.last
@@ -86,7 +65,7 @@ class _QuantityPageState extends State<QuantityPage> {
         ),
       ),
       body: FutureBuilder(
-        future: getItems2(groupId: "1"),
+        future: getItems(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -213,7 +192,7 @@ class _QuantityPageState extends State<QuantityPage> {
                         ),
                       ),
                       Text(
-                        '\$28.61',
+                        '\$${snapshot.data!.first.salePrice}',
                         style: GoogleFonts.openSans(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -252,7 +231,7 @@ class _QuantityPageState extends State<QuantityPage> {
                         ),
                       ),
                       Text(
-                        '\$28.61',
+                        '\$${snapshot.data!.first.salePrice}',
                         style: GoogleFonts.openSans(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,

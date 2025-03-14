@@ -10,14 +10,13 @@ import 'package:microlend_merchant/models/item_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-Future<List<Map<String, dynamic>>> _fetchGroupedItems() async {
-  final appDocDir = await getApplicationDocumentsDirectory();
-  String filePath = '${appDocDir.path}/data.json';
-  File file = File(filePath);
+import '../../util/store.dart';
 
-  if (await file.exists()) {
-    String content = await file.readAsString();
-    List<dynamic> jsonList = jsonDecode(content); // Decode JSON data
+Future<List<Map<String, dynamic>>> _fetchGroupedItems() async {
+  final data = await getData('txns');
+
+  if (data != null && data.isNotEmpty) {
+    List<dynamic> jsonList = jsonDecode(data); // Decode JSON data
 
     // Explicitly cast jsonList to List<Map<String, dynamic>>
     return jsonList.cast<Map<String, dynamic>>();
@@ -61,7 +60,7 @@ class _QRPageState extends State<QRPage> {
             final txnCode = snapshot.data!.last;
 
             txnCode.removeWhere((k, v) => k == 'items');
-            debugPrint('qqqqqqqqq $txnCode');
+            debugPrint(txnCode.toString());
 
             return SingleChildScrollView(
               child: Container(
@@ -148,7 +147,7 @@ class _QRPageState extends State<QRPage> {
                                 ),
                               ),
                               Text(
-                                '\$28.61',
+                                '\$${txnCode['total_price']}',
                                 style: GoogleFonts.openSans(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -187,7 +186,7 @@ class _QRPageState extends State<QRPage> {
                                 ),
                               ),
                               Text(
-                                '\$28.61',
+                                '\$${txnCode['total_price']}',
                                 style: GoogleFonts.openSans(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
