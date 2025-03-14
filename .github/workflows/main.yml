@@ -1,0 +1,40 @@
+name: Build and Deploy Flutter Web
+
+on:
+  push:
+    branches:
+      - dev  # Automatically trigger on pushes to the 'main' branch
+  workflow_dispatch:  # Enable manual runs from the Actions tab
+
+jobs:
+  build:
+    name: Build and Deploy Flutter Web
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Flutter
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+         flutter-version: '3.29.1'
+
+    # Step 3: Navigate to the correct Flutter project folder
+    - name: Install dependencies
+      working-directory: client/microlend_merchant
+      run: flutter pub get
+
+    # Step 4: Build the Flutter Web app
+    - name: Build Flutter Web
+      working-directory: client/microlend_merchant
+      run: flutter build web --release
+
+    # Step 5: Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: client/microlend_merchant/build/web
