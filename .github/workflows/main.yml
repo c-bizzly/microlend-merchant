@@ -24,12 +24,12 @@ jobs:
 
     # Step 3: Navigate to the correct Flutter project folder
     - name: Install dependencies
-      working-directory: client/mircolend_merchant
+      working-directory: microlend-merchant/client/mircolend_merchant
       run: flutter pub get
 
     # Step 4: Build the Flutter Web app
     - name: Build Flutter Web
-      working-directory: client/mircolend_merchant
+      working-directory: microlend-merchant/client/mircolend_merchant
       run: flutter build web --release
 
     # Step 5: Deploy to GitHub Pages
@@ -37,4 +37,4 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: client/mircolend_merchant/build/web
+        publish_dir: microlend-merchant/client/mircolend_merchant/build/web
